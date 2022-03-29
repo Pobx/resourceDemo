@@ -38,7 +38,7 @@ namespace resourceDemo {
 
       services.AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer (JwtBearerDefaults.AuthenticationScheme, options => {
-          Console.WriteLine("=========================> Bearer");
+          Console.WriteLine ("=========================> Bearer");
           options.Authority = "https://localhost:5005";
           options.Audience = "client.kma.jwt";
           options.BackchannelHttpHandler = handler;
@@ -48,15 +48,15 @@ namespace resourceDemo {
           options.ForwardDefaultSelector = Selector.ForwardReferenceToken ("introspection");
         })
         .AddOAuth2Introspection ("introspection", options => {
-          Console.WriteLine("=========================> introspection");
+          Console.WriteLine ("=========================> introspection");
           options.Authority = "https://localhost:5005";
           options.ClientId = "client.kma.token";
           options.ClientSecret = "1e4f9ffe-7949-4993-a92b-f74a9bf6b995";
         });
 
-      services.AddAuthorization(options => {
-        options.AddPolicy("ReadOnly", policy => policy.RequireScope("guest, bio"));
-        options.AddPolicy("FullOperation", policy => policy.RequireScope("pin"));
+      services.AddAuthorization (options => {
+        options.AddPolicy ("ReadOnly", policy => policy.RequireScope (new string[] {"guest", "bio"}));
+        options.AddPolicy ("FullOperation", policy => policy.RequireScope (new string[] {"pin"}));
       });
 
       services.AddHttpClient (OAuth2IntrospectionDefaults.BackChannelHttpClientName).ConfigurePrimaryHttpMessageHandler (() => handler);
