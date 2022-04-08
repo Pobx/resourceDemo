@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using IdentityModel.AspNetCore.AccessTokenValidation;
 using IdentityModel.AspNetCore.OAuth2Introspection;
@@ -16,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace resourceDemo {
   public class Startup {
@@ -28,10 +31,11 @@ namespace resourceDemo {
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices (IServiceCollection services) {
 
+      services.AddCustomSwagger (Configuration);
       services.AddControllers ();
-      services.AddSwaggerGen (c => {
-        c.SwaggerDoc ("v1", new OpenApiInfo { Title = "resourceDemo", Version = "v1" });
-      });
+      // services.AddSwaggerGen (c => {
+      //   c.SwaggerDoc ("v1", new OpenApiInfo { Title = "resourceDemo", Version = "v1" });
+      // });
 
       // var handler = new HttpClientHandler ();
       // handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
@@ -69,13 +73,14 @@ namespace resourceDemo {
       //   app.UseDeveloperExceptionPage ();
       // }
 
-      app.UseSwagger (c => {
-        c.RouteTemplate = "swagger/{documentName}/swagger.json";
-      });
-      app.UseSwaggerUI (c => {
-        c.RoutePrefix = "swagger";
-        c.SwaggerEndpoint ("/swagger/v1/swagger.json", "Weather v1");
-      });
+    	app.UseSwagger(c =>
+			{
+				c.RouteTemplate = "swagger/{documentName}/swagger.json";
+			}).UseSwaggerUI(c =>
+			{
+				c.RoutePrefix = "swagger";
+				c.SwaggerEndpoint($"v1/swagger.json", "Resource API v1");
+			});
 
       app.UseHttpsRedirection ();
 
@@ -87,6 +92,29 @@ namespace resourceDemo {
       app.UseEndpoints (endpoints => {
         endpoints.MapControllers ();
       });
+    }
+
+  }
+
+  static class CustomExtensionsMethods {
+    public static IServiceCollection AddCustomSwagger (this IServiceCollection services, IConfiguration configuration) {
+      services.AddSwaggerGen (options => {
+        options.CustomSchemaIds (type => $"{type.Name}_{Guid.NewGuid()}");
+        options.SwaggerDoc ("v1", new OpenApiInfo {
+          Title = "Resource API",
+            Version = "v1",
+            Description = "The Resource Service HTTP API"
+        });
+        options.DescribeAllParametersInCamelCase ();
+        // options.ExampleFilters ();
+        options.EnableAnnotations ();
+
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine (AppContext.BaseDirectory, xmlFile);
+        options.IncludeXmlComments (xmlPath);
+      });
+
+      return services;
     }
   }
 }
