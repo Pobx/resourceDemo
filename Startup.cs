@@ -33,50 +33,56 @@ namespace resourceDemo {
         c.SwaggerDoc ("v1", new OpenApiInfo { Title = "resourceDemo", Version = "v1" });
       });
 
-      var handler = new HttpClientHandler ();
-      handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+      // var handler = new HttpClientHandler ();
+      // handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-      services.AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer (JwtBearerDefaults.AuthenticationScheme, options => {
-          Console.WriteLine ("=========================> Bearer");
-          options.Authority = "https://localhost:5005";
-          options.Audience = "client.kma.jwt";
-          options.BackchannelHttpHandler = handler;
-          options.TokenValidationParameters.ValidTypes = new [] { "at+jwt" };
-          options.TokenValidationParameters.ValidateAudience = false;
-          // if token does not contain a dot, it is a reference token
-          options.ForwardDefaultSelector = Selector.ForwardReferenceToken ("introspection");
-        })
-        .AddOAuth2Introspection ("introspection", options => {
-          Console.WriteLine ("=========================> introspection");
-          options.Authority = "https://localhost:5005";
-          options.ClientId = "client.kma.token";
-          options.ClientSecret = "1e4f9ffe-7949-4993-a92b-f74a9bf6b995";
-        });
+      // services.AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
+      //   .AddJwtBearer (JwtBearerDefaults.AuthenticationScheme, options => {
+      //     Console.WriteLine ("=========================> Bearer");
+      //     options.Authority = "https://localhost:5005";
+      //     options.Audience = "client.kma.jwt";
+      //     options.BackchannelHttpHandler = handler;
+      //     options.TokenValidationParameters.ValidTypes = new [] { "at+jwt" };
+      //     options.TokenValidationParameters.ValidateAudience = false;
+      //     // if token does not contain a dot, it is a reference token
+      //     options.ForwardDefaultSelector = Selector.ForwardReferenceToken ("introspection");
+      //   })
+      //   .AddOAuth2Introspection ("introspection", options => {
+      //     Console.WriteLine ("=========================> introspection");
+      //     options.Authority = "https://localhost:5005";
+      //     options.ClientId = "client.kma.token";
+      //     options.ClientSecret = "1e4f9ffe-7949-4993-a92b-f74a9bf6b995";
+      //   });
 
-      services.AddAuthorization (options => {
-        options.AddPolicy ("ReadOnly", policy => policy.RequireScope (new string[] {"guest", "bio"}));
-        options.AddPolicy ("FullOperation", policy => policy.RequireScope (new string[] {"pin"}));
-      });
+      // services.AddAuthorization (options => {
+      //   options.AddPolicy ("ReadOnly", policy => policy.RequireScope (new string[] { "guest", "bio" }));
+      //   options.AddPolicy ("FullOperation", policy => policy.RequireScope (new string[] { "pin" }));
+      // });
 
-      services.AddHttpClient (OAuth2IntrospectionDefaults.BackChannelHttpClientName).ConfigurePrimaryHttpMessageHandler (() => handler);
+      // services.AddHttpClient (OAuth2IntrospectionDefaults.BackChannelHttpClientName).ConfigurePrimaryHttpMessageHandler (() => handler);
 
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure (IApplicationBuilder app, IWebHostEnvironment env) {
-      if (env.IsDevelopment ()) {
-        app.UseDeveloperExceptionPage ();
-        app.UseSwagger ();
-        app.UseSwaggerUI (c => c.SwaggerEndpoint ("/swagger/v1/swagger.json", "resourceDemo v1"));
-      }
+      // if (env.IsDevelopment ()) {
+      //   app.UseDeveloperExceptionPage ();
+      // }
 
-      // app.UseHttpsRedirection ();
+      app.UseSwagger (c => {
+        c.RouteTemplate = "swagger/{documentName}/swagger.json";
+      });
+      app.UseSwaggerUI (c => {
+        c.RoutePrefix = "swagger";
+        c.SwaggerEndpoint ("/swagger/v1/swagger.json", "Weather v1");
+      });
+
+      app.UseHttpsRedirection ();
 
       app.UseRouting ();
 
-      app.UseAuthentication ();
-      app.UseAuthorization ();
+      // app.UseAuthentication ();
+      // app.UseAuthorization ();
 
       app.UseEndpoints (endpoints => {
         endpoints.MapControllers ();

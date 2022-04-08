@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace resourceDemo.Controllers {
-  [Authorize (Policy = "ReadOnly")]
+  // [Authorize (Policy = "ReadOnly")]
   [ApiController]
   [Route ("api/[controller]")]
   public class WeatherForecastController : ControllerBase {
