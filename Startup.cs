@@ -93,8 +93,6 @@ namespace resourceDemo
       app.UseSwagger();
       app.UseRouting();
       app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Resource.API  v1"));
-
-
       // app.UseAuthentication ();
       // app.UseAuthorization ();
 
