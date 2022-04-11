@@ -20,22 +20,28 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace resourceDemo {
-  public class Startup {
-    public Startup (IConfiguration configuration) {
+namespace resourceDemo
+{
+  public class Startup
+  {
+    public Startup(IConfiguration configuration)
+    {
       Configuration = configuration;
     }
 
     public IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
-    public void ConfigureServices (IServiceCollection services) {
+    public void ConfigureServices(IServiceCollection services)
+    {
 
-      services.AddCustomSwagger (Configuration);
-      services.AddControllers ();
-      // services.AddSwaggerGen (c => {
-      //   c.SwaggerDoc ("v1", new OpenApiInfo { Title = "resourceDemo", Version = "v1" });
-      // });
+      // services.AddCustomSwagger (Configuration);
+      services.AddControllers();
+      services.AddSwaggerGen(c =>
+      {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "resourceDemo", Version = "v1" });
+      });
+      services.AddSwaggerGenNewtonsoftSupport();
 
       // var handler = new HttpClientHandler ();
       // handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
@@ -68,50 +74,58 @@ namespace resourceDemo {
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure (IApplicationBuilder app, IWebHostEnvironment env) {
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
       // if (env.IsDevelopment ()) {
       //   app.UseDeveloperExceptionPage ();
       // }
 
-    	app.UseSwagger(c =>
-			{
-				c.RouteTemplate = "swagger/{documentName}/swagger.json";
-			}).UseSwaggerUI(c =>
-			{
-				c.RoutePrefix = "swagger";
-				c.SwaggerEndpoint($"v1/swagger.json", "Resource API v1");
-			});
+      // app.UseSwagger(c =>
+      // {
+      //   c.RouteTemplate = "swagger/{documentName}/swagger.json";
+      // }).UseSwaggerUI(c =>
+      // {
+      //   c.RoutePrefix = "swagger";
+      //   c.SwaggerEndpoint($"v1/swagger.json", "Resource API v1");
+      // });
 
-      app.UseHttpsRedirection ();
+      // app.UseHttpsRedirection();
+      app.UseSwagger();
+      app.UseRouting();
+      app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Resource.API  v1"));
 
-      app.UseRouting ();
 
       // app.UseAuthentication ();
       // app.UseAuthorization ();
 
-      app.UseEndpoints (endpoints => {
-        endpoints.MapControllers ();
+      app.UseEndpoints(endpoints =>
+      {
+        endpoints.MapControllers();
       });
     }
 
   }
 
-  static class CustomExtensionsMethods {
-    public static IServiceCollection AddCustomSwagger (this IServiceCollection services, IConfiguration configuration) {
-      services.AddSwaggerGen (options => {
-        options.CustomSchemaIds (type => $"{type.Name}_{Guid.NewGuid()}");
-        options.SwaggerDoc ("v1", new OpenApiInfo {
+  static class CustomExtensionsMethods
+  {
+    public static IServiceCollection AddCustomSwagger(this IServiceCollection services, IConfiguration configuration)
+    {
+      services.AddSwaggerGen(options =>
+      {
+        options.CustomSchemaIds(type => $"{type.Name}_{Guid.NewGuid()}");
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
           Title = "Resource API",
-            Version = "v1",
-            Description = "The Resource Service HTTP API"
+          Version = "v1",
+          Description = "The Resource Service HTTP API"
         });
-        options.DescribeAllParametersInCamelCase ();
+        options.DescribeAllParametersInCamelCase();
         // options.ExampleFilters ();
-        options.EnableAnnotations ();
+        options.EnableAnnotations();
 
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        var xmlPath = Path.Combine (AppContext.BaseDirectory, xmlFile);
-        options.IncludeXmlComments (xmlPath);
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        options.IncludeXmlComments(xmlPath);
       });
 
       return services;
