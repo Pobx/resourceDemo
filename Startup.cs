@@ -92,6 +92,7 @@ namespace resourceDemo
       // app.UseHttpsRedirection();
       app.UseSwagger();
       app.UseRouting();
+      app.UseAuthorization();
       app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Resource.API  v1"));
       // app.UseAuthentication ();
       // app.UseAuthorization ();
