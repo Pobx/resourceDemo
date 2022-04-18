@@ -47,12 +47,10 @@ namespace resourceDemo
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-
       app.UseSwagger();
       app.UseRouting();
       app.UseAuthorization();
       app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Resource.API  v1"));
-
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
