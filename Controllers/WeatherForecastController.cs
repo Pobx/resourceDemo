@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace resourceDemo.Controllers
 {
-  // [Authorize (Policy = "ReadOnly")]
   [ApiController]
   [Route("api/[controller]")]
   public class WeatherForecastController : ControllerBase
@@ -56,6 +55,12 @@ namespace resourceDemo.Controllers
     public int Age()
     {
       return 35;
+    }
+
+    [HttpGet("guest")]
+    public string Guest()
+    {
+      return "Hello guest !";
     }
   }
 }
